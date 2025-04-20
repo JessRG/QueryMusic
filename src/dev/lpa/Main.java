@@ -10,6 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
+import java.util.Scanner;
 
 public class Main {
 
@@ -22,14 +23,18 @@ public class Main {
             throw new RuntimeException(e);
         }
 
-        String albumName = "Tapestry";
-        String query = "SELECT * FROM music.albumview WHERE album_name='%s'"
-                .formatted(albumName);
-
         var dataSource = new MysqlDataSource();
         dataSource.setServerName(props.getProperty("serverName"));
         dataSource.setPort(Integer.parseInt(props.getProperty("port")));
         dataSource.setDatabaseName(props.getProperty("databaseName"));
+
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter an Artist Id: ");
+        String artistId = scanner.nextLine();
+        int artistid = Integer.parseInt(artistId);
+
+        String query = "SELECT * FROM music.artists WHERE artist_id=%d"
+                .formatted(artistid);
 
         try (var connection = dataSource.getConnection(
                 props.getProperty("user"),
@@ -39,13 +44,7 @@ public class Main {
             ResultSet resultSet = statement.executeQuery(query);
 
             var meta = resultSet.getMetaData();
-            for (int i = 1; i <= meta.getColumnCount(); i++) {
-                System.out.printf("%d %s %s%n",
-                        i,
-                        meta.getColumnName(i),
-                        meta.getColumnTypeName(i)
-                );
-            }
+
             System.out.println("===================");
 
             for (int i = 1; i <= meta.getColumnCount(); i++) {
