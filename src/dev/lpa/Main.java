@@ -22,7 +22,9 @@ public class Main {
             throw new RuntimeException(e);
         }
 
-        String query = "SELECT * FROM music.artists";
+        String albumName = "Tapestry";
+        String query = "SELECT * FROM music.albumview WHERE album_name='%s'"
+                .formatted(albumName);
 
         var dataSource = new MysqlDataSource();
         dataSource.setServerName(props.getProperty("serverName"));
@@ -36,9 +38,20 @@ public class Main {
         ) {
             ResultSet resultSet = statement.executeQuery(query);
 
-            while (resultSet.next()) {
-                System.out.printf("%d %s %n", resultSet.getInt(1),
-                        resultSet.getString("artist_name")
+            var meta = resultSet.getMetaData();
+            for (int i = 1; i <= meta.getColumnCount(); i++) {
+                System.out.printf("%d %s %s%n",
+                        i,
+                        meta.getColumnName(i),
+                        meta.getColumnTypeName(i)
+                );
+            }
+            System.out.println("===================");
+             while (resultSet.next()) {
+                System.out.printf("%d %s %s %n",
+                        resultSet.getInt("track_number"),
+                        resultSet.getString("artist_name"),
+                        resultSet.getString("song_title")
                 );
             }
         } catch (SQLException e) {
