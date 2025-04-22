@@ -10,7 +10,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
-import java.util.Scanner;
 
 public class Main {
 
@@ -28,13 +27,20 @@ public class Main {
         dataSource.setPort(Integer.parseInt(props.getProperty("port")));
         dataSource.setDatabaseName(props.getProperty("databaseName"));
 
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Enter an Artist Id: ");
-        String artistId = scanner.nextLine();
-        int artistid = Integer.parseInt(artistId);
+//        String query = "SELECT * FROM music.artists limit 10";
 
-        String query = "SELECT * FROM music.artists WHERE artist_id=%d"
-                .formatted(artistid);
+        // specify subquery (RankedRows) with a sequential number (row_num)
+        // that gets assigned to every record in artists table, which is first
+        // sorted by artist id, then get the records with row_num <= 10
+        String query = """
+                WITH RankedRows AS (
+                                    SELECT *,
+                                    ROW_NUMBER() OVER (ORDER BY artist_id) AS row_num
+                                    FROM music.artists
+                                  )
+                                  SELECT *
+                                      FROM RankedRows
+                                  WHERE row_num <= 10""";
 
         try (var connection = dataSource.getConnection(
                 props.getProperty("user"),
