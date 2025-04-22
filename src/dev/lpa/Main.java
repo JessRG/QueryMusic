@@ -26,21 +26,25 @@ public class Main {
         dataSource.setServerName(props.getProperty("serverName"));
         dataSource.setPort(Integer.parseInt(props.getProperty("port")));
         dataSource.setDatabaseName(props.getProperty("databaseName"));
-
-//        String query = "SELECT * FROM music.artists limit 10";
+        try {
+            dataSource.setMaxRows(10);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        String query = "SELECT * FROM music.artists";
 
         // specify subquery (RankedRows) with a sequential number (row_num)
         // that gets assigned to every record in artists table, which is first
         // sorted by artist id, then get the records with row_num <= 10
-        String query = """
-                WITH RankedRows AS (
-                                    SELECT *,
-                                    ROW_NUMBER() OVER (ORDER BY artist_id) AS row_num
-                                    FROM music.artists
-                                  )
-                                  SELECT *
-                                      FROM RankedRows
-                                  WHERE row_num <= 10""";
+//        String query = """
+//                WITH RankedRows AS (
+//                                    SELECT *,
+//                                    ROW_NUMBER() OVER (ORDER BY artist_id) AS row_num
+//                                    FROM music.artists
+//                                  )
+//                                  SELECT *
+//                                      FROM RankedRows
+//                                  WHERE row_num <= 10""";
 
         try (var connection = dataSource.getConnection(
                 props.getProperty("user"),
