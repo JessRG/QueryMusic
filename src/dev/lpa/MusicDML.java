@@ -14,11 +14,13 @@ public class MusicDML {
         ) {
             String tableName = "music.artists";
             String columnName = "artist_name";
-            String columnValue = "Bob Dylan";
+            String columnValue = "Elf";
             if (!executeSelect(statement, tableName, columnName, columnValue)) {
                 System.out.println("Maybe we should add this record");
                 insertRecord(statement, tableName, new String[] {columnName},
                         new String[] {columnValue});
+            } else {
+                deleteRecords(statement, tableName, columnName, columnValue);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -76,5 +78,21 @@ public class MusicDML {
             executeSelect(statement, table, columnNames[0], columnValues[0]);
         }
         return recordsInserted > 0;
+    }
+
+    private static boolean deleteRecords(Statement statement, String table,
+                                         String columnName, String columnValue)
+        throws SQLException {
+
+        String query = "DELETE FROM %s WHERE %s='%s'"
+                .formatted(table, columnName, columnValue);
+        System.out.println(query);
+        statement.execute(query);
+        int recordsDeleted = statement.getUpdateCount();
+        if (recordsDeleted > 0) {
+            executeSelect(statement, table,
+                    columnName, columnValue);
+        }
+        return recordsDeleted > 0;
     }
 }
