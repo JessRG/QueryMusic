@@ -20,7 +20,7 @@ public class MusicDML {
                 insertRecord(statement, tableName, new String[] {columnName},
                         new String[] {columnValue});
             } else {
-                deleteRecords(statement, tableName, columnName, columnValue);
+                deleteRecord(statement, tableName, columnName, columnValue);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -80,7 +80,7 @@ public class MusicDML {
         return recordsInserted > 0;
     }
 
-    private static boolean deleteRecords(Statement statement, String table,
+    private static boolean deleteRecord(Statement statement, String table,
                                          String columnName, String columnValue)
         throws SQLException {
 
