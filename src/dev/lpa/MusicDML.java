@@ -20,7 +20,10 @@ public class MusicDML {
                 insertRecord(statement, tableName, new String[] {columnName},
                         new String[] {columnValue});
             } else {
-                deleteRecord(statement, tableName, columnName, columnValue);
+//                deleteRecord(statement, tableName, columnName, columnValue);
+                updateRecord(statement, tableName, columnName,
+                        columnValue, columnName,
+                        columnValue.toUpperCase());
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -94,5 +97,23 @@ public class MusicDML {
                     columnName, columnValue);
         }
         return recordsDeleted > 0;
+    }
+
+    private static boolean updateRecord(Statement statement, String table,
+                                         String matchedColumn, String matchedValue,
+                                         String updatedColumn, String updatedValue)
+            throws SQLException {
+
+        String query = "UPDATE %s SET %s = '%s' WHERE %s='%s'"
+                .formatted(table, updatedColumn, updatedValue, matchedColumn,
+                        matchedValue);
+        System.out.println(query);
+        statement.execute(query);
+        int recordsUpdated = statement.getUpdateCount();
+        if (recordsUpdated > 0) {
+            executeSelect(statement, table,
+                    updatedColumn, updatedValue);
+        }
+        return recordsUpdated > 0;
     }
 }
